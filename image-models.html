@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comparatif modèles image</title>
+  <style>
+    :root {
+      --bg:#07101d; --bg2:#0d1526; --panel:rgba(15,22,40,.88); --text:#eef4ff; --muted:#9db0d0;
+      --accent:#6ea8fe; --accent2:#8b5cf6; --accent3:#10b981; --warn:#f59e0b; --border:rgba(255,255,255,.08);
+      --shadow:0 24px 60px rgba(0,0,0,.28); --radius:22px;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at top left, rgba(110,168,254,.16), transparent 24%),linear-gradient(180deg,var(--bg),var(--bg2) 50%,#101827)}
+    .wrap{max-width:1420px;margin:0 auto;padding:28px} .panel,.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
+    .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-bottom:18px}.pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.pill{padding:8px 12px;border-radius:999px;font-size:12px;background:rgba(110,168,254,.10);border:1px solid rgba(110,168,254,.18);color:#dbeafe}
+    h1{margin:0 0 10px;font-size:38px;line-height:1.05;letter-spacing:-.03em} h2{margin:0 0 14px;font-size:20px} p,.muted{color:var(--muted);line-height:1.55;margin:0}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-bottom:18px}.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}.value{font-size:32px;font-weight:800;letter-spacing:-.03em}
+    .grid{display:grid;gap:18px}.two{grid-template-columns:1fr 1fr}.table-wrap{overflow:auto;border-radius:18px}.table{width:100%;border-collapse:collapse;min-width:920px}.table th,.table td{text-align:left;padding:14px 12px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}.table th{color:#d9e6ff;background:rgba(255,255,255,.02)}
+    .stars{letter-spacing:2px;color:#ffd166}.tag{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);margin:0 6px 6px 0}.rec{background:rgba(16,185,129,.12);color:#c6f7e2}.link{color:#dce9ff;text-decoration:none;border:1px solid rgba(255,255,255,.10);padding:10px 14px;border-radius:999px;display:inline-flex;margin-top:14px}.link:hover{background:rgba(255,255,255,.05)}
+    ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.65}.note{font-size:13px;color:var(--muted)}
+    @media(max-width:980px){.hero,.two{grid-template-columns:1fr}} @media(max-width:680px){.wrap{padding:18px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="panel">
+      <div class="pills">
+        <div class="pill">Comparatif image</div>
+        <div class="pill">Replicate</div>
+        <div class="pill">USD + XOF</div>
+      </div>
+      <h1>Comparatif modèles de génération d’image</h1>
+      <p>Cette page compare les modèles Replicate que tu m’as donnés selon le coût, le nombre d’images par dollar, le réalisme estimé et la pertinence business. Les montants XOF utilisent un taux indicatif de <strong>1 USD = 564,24 XOF</strong>.</p>
+      <a class="link" href="./index.html">← Retour au dashboard principal</a>
+    </div>
+    <div class="panel">
+      <div class="label">Résumé rapide</div>
+      <div class="value">3 meilleurs choix</div>
+      <div style="margin-top:14px">
+        <div class="tag rec">Volume : Z-Image Turbo / GPT Image 1.5 Low</div>
+        <div class="tag rec">Marketing : Recraft V3</div>
+        <div class="tag rec">Premium / réalisme : Nano Banana Pro</div>
+      </div>
+      <p class="note" style="margin-top:14px">Le réalisme et la pertinence sont des notes pragmatiques, pas un benchmark labo. Elles servent à orienter ton choix rapidement.</p>
+    </div>
+  </section>
+
+  <section class="cards">
+    <div class="card"><div class="label">Le moins cher</div><div class="value">Z-Image Turbo</div><p class="muted">≈ 2,82 XOF / image à ~1MP</p></div>
+    <div class="card"><div class="label">Meilleur ratio OpenAI</div><div class="value">GPT Image 1.5 Low</div><p class="muted">≈ 7,34 XOF / image</p></div>
+    <div class="card"><div class="label">Meilleur pour le marketing</div><div class="value">Recraft V3</div><p class="muted">≈ 22,57 XOF / image</p></div>
+    <div class="card"><div class="label">Le plus premium</div><div class="value">Nano Banana Pro</div><p class="muted">≈ 84,64 XOF / image</p></div>
+  </section>
+
+  <section class="panel" style="margin-bottom:18px;">
+    <h2>Tableau comparatif</h2>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Modèle</th>
+            <th>Coût USD</th>
+            <th>Coût XOF</th>
+            <th>Images / 1 $</th>
+            <th>Réalisme</th>
+            <th>Pertinence</th>
+            <th>Usage conseillé</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Nano Banana Pro</td><td>$0.15 / image</td><td>84,64 XOF</td><td>6,67</td><td><span class="stars">★★★★★★★★★</span></td><td><span class="stars">★★★★★★★★☆</span></td><td>Rendus premium, réalisme, édition haut de gamme</td></tr>
+          <tr><td>Nano Banana 2 (1K)</td><td>$0.067 / image</td><td>37,80 XOF</td><td>14,93</td><td><span class="stars">★★★★★★★★☆</span></td><td><span class="stars">★★★★★★★★☆</span></td><td>Compromis qualité/prix côté Google</td></tr>
+          <tr><td>GPT Image 1.5 Low</td><td>$0.013 / image</td><td>7,34 XOF</td><td>76,92</td><td><span class="stars">★★★★★★★☆☆</span></td><td><span class="stars">★★★★★★★★★</span></td><td>Tests rapides, volume, coût faible</td></tr>
+          <tr><td>GPT Image 1.5 Auto</td><td>$0.136 / image</td><td>76,74 XOF</td><td>7,35</td><td><span class="stars">★★★★★★★★☆</span></td><td><span class="stars">★★★★★★★★★</span></td><td>Polyvalence premium OpenAI</td></tr>
+          <tr><td>Qwen Image</td><td>$0.025 / image</td><td>14,11 XOF</td><td>40</td><td><span class="stars">★★★★★★★☆☆</span></td><td><span class="stars">★★★★★★★★☆</span></td><td>Volume à bon prix, bon rendu texte</td></tr>
+          <tr><td>Recraft V3</td><td>$0.04 / image</td><td>22,57 XOF</td><td>25</td><td><span class="stars">★★★★★★★☆☆</span></td><td><span class="stars">★★★★★★★★★★</span></td><td>Visuels marketing, branding, créas propres</td></tr>
+          <tr><td>Qwen Image 2 Pro</td><td>$0.075 / image</td><td>42,32 XOF</td><td>13,33</td><td><span class="stars">★★★★★★★★☆</span></td><td><span class="stars">★★★★★★★★☆</span></td><td>Réalisme/fidélité supérieurs à Qwen standard</td></tr>
+          <tr><td>Z-Image Turbo (~1MP)</td><td>≈ $0.005 / image</td><td>≈ 2,82 XOF</td><td>200</td><td><span class="stars">★★★★★★☆☆☆</span></td><td><span class="stars">★★★★★★★☆☆</span></td><td>Génération massive à très bas coût</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="grid two">
+    <div class="panel">
+      <h2>Mes recommandations</h2>
+      <ul>
+        <li><strong>Meilleur pour le réalisme premium :</strong> Nano Banana Pro</li>
+        <li><strong>Meilleur compromis qualité / prix :</strong> Nano Banana 2</li>
+        <li><strong>Meilleur pour tester en volume :</strong> GPT Image 1.5 Low</li>
+        <li><strong>Meilleur pour le marketing / branding :</strong> Recraft V3</li>
+        <li><strong>Meilleur coût pur :</strong> Z-Image Turbo si la qualité te suffit</li>
+        <li><strong>Meilleur milieu de gamme flexible :</strong> Qwen Image</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>Lecture rapide par objectif</h2>
+      <ul>
+        <li><strong>Pub / créas marketing :</strong> Recraft V3</li>
+        <li><strong>Images premium / réalistes :</strong> Nano Banana Pro ou Qwen Image 2 Pro</li>
+        <li><strong>Budget serré :</strong> Z-Image Turbo ou GPT Image 1.5 Low</li>
+        <li><strong>Google stack sérieuse :</strong> Nano Banana 2</li>
+        <li><strong>Polyvalence OpenAI :</strong> GPT Image 1.5 Auto</li>
+      </ul>
+      <p class="note" style="margin-top:12px">Pour brancher ça à un agent OpenClaw, le mode le plus simple reste un <strong>token API Replicate</strong>, pas un OAuth Google.</p>
+    </div>
+  </section>
+</div>
+</body>
+</html>
