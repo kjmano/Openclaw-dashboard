@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard LLM Usage V3</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #09111f;
+      --panel: rgba(18, 25, 45, 0.92);
+      --text: #edf2ff;
+      --muted: #98abd0;
+      --accent: #60a5fa;
+      --accent2: #8b5cf6;
+      --accent3: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --border: rgba(255,255,255,.08);
+      --shadow: 0 18px 40px rgba(0,0,0,.22);
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, system-ui, sans-serif; color:var(--text); background: radial-gradient(circle at top right, rgba(96,165,250,.12), transparent 22%), linear-gradient(180deg, #09111f, #0f172a 50%, #111827); }
+    .wrap { max-width: 1380px; margin: 0 auto; padding: 24px; }
+    .panel,.card { background: var(--panel); border:1px solid var(--border); border-radius:20px; padding:18px; box-shadow: var(--shadow); }
+    .hero { display:grid; grid-template-columns:1.4fr .8fr; gap:16px; margin-bottom:18px; }
+    .grid { display:grid; gap:16px; }
+    .cards { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:18px; }
+    .two { grid-template-columns: 1.1fr .9fr; }
+    .three { grid-template-columns: repeat(3,1fr); }
+    .pill { display:inline-flex; padding:6px 10px; border-radius:999px; font-size:12px; background: rgba(96,165,250,.12); border:1px solid rgba(96,165,250,.2); color:#dbeafe; margin-right:8px; margin-bottom:6px; }
+    h1 { margin:8px 0 6px; font-size:34px; }
+    h2 { margin:0 0 14px; font-size:20px; }
+    p, .sub, .muted { color: var(--muted); }
+    .label { color:var(--muted); font-size:13px; margin-bottom:6px; }
+    .value { font-size:30px; font-weight:800; line-height:1.1; }
+    .table { width:100%; border-collapse:collapse; }
+    .table th,.table td { text-align:left; padding:12px 10px; border-bottom:1px solid var(--border); font-size:14px; vertical-align:top; }
+    .table th { color:#cdddff; font-weight:700; }
+    .badge { display:inline-flex; padding:4px 10px; border-radius:999px; font-size:12px; border:1px solid var(--border); }
+    .ok { background: rgba(16,185,129,.12); color:#b9f5d7; }
+    .warn { background: rgba(245,158,11,.12); color:#ffe2a7; }
+    .mini { background: rgba(255,255,255,.03); border:1px solid var(--border); border-radius:14px; padding:12px; }
+    canvas { max-height: 340px; }
+    code { color:#dbeafe; }
+    @media (max-width: 980px){ .hero,.two,.three{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="panel">
+      <div class="pill">JanusOne ⭐</div><div class="pill">V3</div><div class="pill">Auto-collected</div>
+      <h1>Dashboard d’usage LLM</h1>
+      <p>V3 lit automatiquement les sessions OpenClaw locales, agrège les usages réels, les coûts remontés par le provider et prépare la vue main + sous-agents sans saisie manuelle.</p>
+    </div>
+    <div class="panel">
+      <div class="label">Dernière génération</div>
+      <div id="generatedAt" class="value" style="font-size:22px">—</div>
+      <div id="providers" class="sub">—</div>
+      <div class="grid two" style="margin-top:12px; grid-template-columns:1fr 1fr;">
+        <div class="mini"><div class="label">Cache hit</div><div id="cacheHit" class="value" style="font-size:22px">—</div></div>
+        <div class="mini"><div class="label">Coût estimé</div><div id="estimatedCost" class="value" style="font-size:22px">—</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid cards">
+    <div class="card"><div class="label">Sessions suivies</div><div id="sessionsCount" class="value">0</div></div>
+    <div class="card"><div class="label">Sous-agents</div><div id="subagentsCount" class="value">0</div></div>
+    <div class="card"><div class="label">Tokens total</div><div id="tokensTotal" class="value">0</div></div>
+    <div class="card"><div class="label">Input</div><div id="inputTotal" class="value">0</div></div>
+    <div class="card"><div class="label">Output</div><div id="outputTotal" class="value">0</div></div>
+    <div class="card"><div class="label">Modèles</div><div id="modelsCount" class="value">0</div><div id="modelsList" class="sub">—</div></div>
+  </section>
+
+  <section class="grid two">
+    <div class="panel"><h2>Usage par session / agent</h2><canvas id="agentsChart"></canvas></div>
+    <div class="panel"><h2>Input vs Output</h2><canvas id="ioChart"></canvas></div>
+  </section>
+
+  <section class="grid two" style="margin-top:16px;">
+    <div class="panel"><h2>Répartition par modèle</h2><canvas id="modelsChart"></canvas></div>
+    <div class="panel"><h2>Répartition par provider</h2><canvas id="providersChart"></canvas></div>
+  </section>
+
+  <section class="grid two" style="margin-top:16px;">
+    <div class="panel"><h2>Timeline tokens par message</h2><canvas id="timelineChart"></canvas></div>
+    <div class="panel"><h2>APIs connectées</h2><canvas id="apiChart"></canvas></div>
+  </section>
+
+  <section class="grid two" style="margin-top:16px;">
+    <div class="panel">
+      <h2>Sessions et sous-agents</h2>
+      <table class="table"><thead><tr><th>Nom</th><th>Type</th><th>Modèle</th><th>Tokens</th><th>Coût</th><th>Statut</th></tr></thead><tbody id="sessionsBody"></tbody></table>
+    </div>
+    <div class="panel">
+      <h2>Vue sous-agents</h2>
+      <div id="subagentsPanel" class="muted"></div>
+    </div>
+  </section>
+
+  <section class="grid two" style="margin-top:16px;">
+    <div class="panel">
+      <h2>Inventaire des APIs</h2>
+      <table class="table"><thead><tr><th>API</th><th>Groupe</th><th>État</th></tr></thead><tbody id="apisBody"></tbody></table>
+    </div>
+    <div class="panel">
+      <h2>Notes & limites</h2>
+      <ul id="notesList" class="muted"></ul>
+      <div class="muted">Fichier de données: <code>usage-data.json</code> · Généré par <code>generate_usage_data.py</code></div>
+    </div>
+  </section>
+</div>
+<script>
+const fmt = new Intl.NumberFormat('fr-FR');
+const safe = (v,f='—') => (v===null||v===undefined||v==='') ? f : v;
+const badge = s => `<span class="badge ${(s==='connected'||s==='active')?'ok':'warn'}">${s}</span>`;
+const money = v => (v===null||v===undefined) ? '—' : `${v.toFixed(4)} $`;
+const chartText = '#edf2ff';
+const gridColor = 'rgba(255,255,255,.06)';
+
+fetch('./usage-data.json').then(r=>r.json()).then(data => {
+  const rows = [...(data.sessions||[]), ...(data.subagents||[])];
+  document.getElementById('generatedAt').textContent = new Date(data.generatedAt).toLocaleString('fr-FR');
+  document.getElementById('providers').textContent = `Providers: ${(data.summary.providers||[]).join(', ') || '—'}`;
+  document.getElementById('cacheHit').textContent = `${safe(data.summary.cacheHitPercent,0)}%`;
+  document.getElementById('estimatedCost').textContent = money(data.summary.estimatedCost);
+  document.getElementById('sessionsCount').textContent = fmt.format(data.summary.sessions||0);
+  document.getElementById('subagentsCount').textContent = fmt.format(data.summary.subagents||0);
+  document.getElementById('tokensTotal').textContent = fmt.format(data.summary.totalTokensKnown||0);
+  document.getElementById('inputTotal').textContent = fmt.format(data.summary.totalInputKnown||0);
+  document.getElementById('outputTotal').textContent = fmt.format(data.summary.totalOutputKnown||0);
+  document.getElementById('modelsCount').textContent = fmt.format((data.summary.models||[]).length);
+  document.getElementById('modelsList').textContent = (data.summary.models||[]).join(', ') || '—';
+
+  document.getElementById('sessionsBody').innerHTML = rows.map(s => `
+    <tr><td>${safe(s.name)}</td><td>${safe(s.kind)}</td><td>${safe(s.model)}</td><td>${fmt.format((s.tokens&&s.tokens.total)||0)}</td><td>${money(s.cost)}</td><td>${badge(s.status||'unknown')}</td></tr>
+  `).join('') || '<tr><td colspan="6">Aucune session</td></tr>';
+
+  const sub = document.getElementById('subagentsPanel');
+  sub.innerHTML = (data.subagents||[]).length ? data.subagents.map(s => `<div class="mini" style="margin-bottom:10px;"><strong>${s.name}</strong><div class="muted">${safe(s.model)} · ${fmt.format((s.tokens&&s.tokens.total)||0)} tokens · ${money(s.cost)}</div></div>`).join('') : '<div class="muted">Aucun sous-agent détecté pour le moment. Dès qu’un sous-agent apparaît dans les sessions OpenClaw, il sera affiché ici automatiquement.</div>';
+
+  document.getElementById('apisBody').innerHTML = (data.apis||[]).map(api => `<tr><td>${api.name}</td><td>${safe(api.group)}</td><td>${badge(api.status)}</td></tr>`).join('');
+  document.getElementById('notesList').innerHTML = (data.summary.notes||[]).map(n => `<li>${n}</li>`).join('');
+
+  const common = { responsive:true, plugins:{ legend:{ labels:{ color:chartText } } }, scales:{ x:{ ticks:{ color:chartText }, grid:{ color:gridColor } }, y:{ ticks:{ color:chartText }, grid:{ color:gridColor } } } };
+
+  new Chart(document.getElementById('agentsChart'), { type:'bar', data:{ labels:rows.map(r=>r.name), datasets:[{ label:'Tokens', data:rows.map(r=>(r.tokens&&r.tokens.total)||0), backgroundColor:'#60a5fa' }]}, options:common });
+  new Chart(document.getElementById('ioChart'), { type:'bar', data:{ labels:rows.map(r=>r.name), datasets:[{ label:'Input', data:rows.map(r=>(r.tokens&&r.tokens.input)||0), backgroundColor:'#8b5cf6' },{ label:'Output', data:rows.map(r=>(r.tokens&&r.tokens.output)||0), backgroundColor:'#10b981' }]}, options:common });
+  new Chart(document.getElementById('modelsChart'), { type:'doughnut', data:{ labels:(data.modelsBreakdown||[]).map(m=>m.model), datasets:[{ data:(data.modelsBreakdown||[]).map(m=>m.tokens), backgroundColor:['#60a5fa','#8b5cf6','#10b981','#f59e0b','#ef4444'] }]}, options:{ plugins:{ legend:{ labels:{ color:chartText } } } } });
+  new Chart(document.getElementById('providersChart'), { type:'pie', data:{ labels:(data.providersBreakdown||[]).map(p=>p.provider), datasets:[{ data:(data.providersBreakdown||[]).map(p=>p.tokens), backgroundColor:['#60a5fa','#8b5cf6','#10b981','#f59e0b'] }]}, options:{ plugins:{ legend:{ labels:{ color:chartText } } } } });
+  new Chart(document.getElementById('timelineChart'), { type:'line', data:{ labels:(data.timeline||[]).map((p,i)=> i+1), datasets:[{ label:'Tokens / message', data:(data.timeline||[]).map(p=>p.totalTokens||0), borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,.2)', tension:.25, fill:true }]}, options:common });
+  const apiCounts = { connected:(data.apis||[]).filter(a=>a.status==='connected').length, other:(data.apis||[]).filter(a=>a.status!=='connected').length };
+  new Chart(document.getElementById('apiChart'), { type:'doughnut', data:{ labels:['Connectées','À vérifier'], datasets:[{ data:[apiCounts.connected, apiCounts.other], backgroundColor:['#10b981','#f59e0b'] }]}, options:{ plugins:{ legend:{ labels:{ color:chartText } } } } });
+});
+</script>
+</body>
+</html>
