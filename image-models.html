@@ -13,7 +13,7 @@
     *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at top left, rgba(110,168,254,.16), transparent 24%),linear-gradient(180deg,var(--bg),var(--bg2) 50%,#101827)}
     .wrap{max-width:1420px;margin:0 auto;padding:28px} .panel,.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
     .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-bottom:18px}.pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.pill{padding:8px 12px;border-radius:999px;font-size:12px;background:rgba(110,168,254,.10);border:1px solid rgba(110,168,254,.18);color:#dbeafe}
-    h1{margin:0 0 10px;font-size:38px;line-height:1.05;letter-spacing:-.03em} h2{margin:0 0 14px;font-size:20px} p,.muted{color:var(--muted);line-height:1.55;margin:0}
+    h1{margin:0 0 10px;font-size:38px;line-height:1.05;letter-spacing:-.03em} h2{margin:0 0 14px;font-size:20px} h3{margin:0 0 10px;font-size:16px;color:#e6efff} p,.muted{color:var(--muted);line-height:1.55;margin:0}
     .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-bottom:18px}.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}.value{font-size:32px;font-weight:800;letter-spacing:-.03em}
     .grid{display:grid;gap:18px}.two{grid-template-columns:1fr 1fr}.table-wrap{overflow:auto;border-radius:18px}.table{width:100%;border-collapse:collapse;min-width:920px}.table th,.table td{text-align:left;padding:14px 12px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}.table th{color:#d9e6ff;background:rgba(255,255,255,.02)}
     .stars{letter-spacing:2px;color:#ffd166}.tag{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);margin:0 6px 6px 0}.rec{background:rgba(16,185,129,.12);color:#c6f7e2}.link{color:#dce9ff;text-decoration:none;border:1px solid rgba(255,255,255,.10);padding:10px 14px;border-radius:999px;display:inline-flex;margin-top:14px}.link:hover{background:rgba(255,255,255,.05)}
@@ -105,6 +105,64 @@
       </ul>
       <p class="note" style="margin-top:12px">Pour brancher ça à un agent OpenClaw, le mode le plus simple reste un <strong>token API Replicate</strong>, pas un OAuth Google.</p>
     </div>
+  </section>
+
+  <section class="panel" style="margin-top:18px;">
+    <h2>Meilleur modèle selon usage — version détaillée</h2>
+    <div class="grid two">
+      <div>
+        <h3>1. Pour des visuels publicitaires et marketing</h3>
+        <ul>
+          <li><strong>Choix principal :</strong> Recraft V3</li>
+          <li><strong>Pourquoi :</strong> très pertinent pour branding, affiches, visuels propres, compositions lisibles et styles variés.</li>
+          <li><strong>Alternative premium :</strong> GPT Image 1.5 Auto</li>
+          <li><strong>À choisir si :</strong> tu fais des pubs, covers, visuels de tunnel, miniatures ou assets de marque.</li>
+        </ul>
+
+        <h3 style="margin-top:18px;">2. Pour du réalisme photo haut de gamme</h3>
+        <ul>
+          <li><strong>Choix principal :</strong> Nano Banana Pro</li>
+          <li><strong>Pourquoi :</strong> c’est celui qui paraît le plus orienté rendu premium, réalisme et édition sérieuse.</li>
+          <li><strong>Alternative plus abordable :</strong> Qwen Image 2 Pro</li>
+          <li><strong>À choisir si :</strong> tu veux des rendus premium, produits, portraits, scènes réalistes ou éditoriales.</li>
+        </ul>
+
+        <h3 style="margin-top:18px;">3. Pour un bon compromis qualité / prix</h3>
+        <ul>
+          <li><strong>Choix principal :</strong> Nano Banana 2</li>
+          <li><strong>Pourquoi :</strong> moins cher que Nano Banana Pro, mais toujours positionné assez haut en qualité.</li>
+          <li><strong>Alternative :</strong> Qwen Image</li>
+          <li><strong>À choisir si :</strong> tu veux une qualité solide sans monter directement sur les modèles les plus chers.</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3>4. Pour générer beaucoup à petit budget</h3>
+        <ul>
+          <li><strong>Choix principal :</strong> Z-Image Turbo</li>
+          <li><strong>Pourquoi :</strong> c’est le plus agressif en coût, surtout si tu maîtrises la résolution.</li>
+          <li><strong>Alternative pratique :</strong> GPT Image 1.5 Low</li>
+          <li><strong>À choisir si :</strong> tu fais du test de masse, des variations nombreuses ou de la prod rapide.</li>
+        </ul>
+
+        <h3 style="margin-top:18px;">5. Pour du texte dans l’image / rendu sémantique correct</h3>
+        <ul>
+          <li><strong>Choix principal :</strong> Qwen Image</li>
+          <li><strong>Pourquoi :</strong> sa page met en avant les progrès sur le rendu de texte complexe.</li>
+          <li><strong>Alternative premium :</strong> Qwen Image 2 Pro</li>
+          <li><strong>À choisir si :</strong> tu veux des affiches, citations, textes intégrés ou interfaces visuelles.</li>
+        </ul>
+
+        <h3 style="margin-top:18px;">6. Pour un agent illustration branché business</h3>
+        <ul>
+          <li><strong>Stack recommandée :</strong> Recraft V3 + GPT Image 1.5 Low + Nano Banana Pro</li>
+          <li><strong>Logique :</strong> Recraft pour les créas marketing, GPT Low pour le volume/test, Nano Banana Pro pour les rendus premium finaux.</li>
+          <li><strong>Version budget serré :</strong> Z-Image Turbo + Qwen Image</li>
+          <li><strong>Version Google-centric :</strong> Nano Banana 2 + Nano Banana Pro</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note" style="margin-top:16px;">Mon conseil global : ne choisis pas un seul modèle pour tout. Pour un vrai workflow pro, il vaut mieux un trio : <strong>un modèle volume</strong>, <strong>un modèle marketing/design</strong> et <strong>un modèle premium final</strong>.</p>
   </section>
 </div>
 </body>
