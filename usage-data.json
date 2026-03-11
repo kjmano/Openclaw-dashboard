@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-11T09:24:23.714057Z",
+  "generatedAt": "2026-03-11T10:42:12.273953Z",
   "version": 3,
   "currency": "USD",
   "pricing": {
@@ -15,18 +15,18 @@
     "models": [
       "gpt-5.4"
     ],
-    "totalTokensKnown": 166727,
-    "totalInputKnown": 431,
-    "totalOutputKnown": 377,
-    "cacheRead": 166528,
+    "totalTokensKnown": 173384,
+    "totalInputKnown": 2433,
+    "totalOutputKnown": 349,
+    "cacheRead": 172800,
     "cacheWrite": 0,
-    "estimatedCost": 9.832397,
+    "estimatedCost": 11.523046,
     "notes": [
       "V3 now reads local OpenClaw session transcripts and aggregates real usage automatically.",
       "Sub-agent rows will appear automatically as soon as OpenClaw stores them in the local session index.",
       "Costs come from transcript usage when the provider reports them; otherwise values stay partial."
     ],
-    "cacheHitPercent": 99.9
+    "cacheHitPercent": 99.7
   },
   "sessions": [
     {
@@ -57,17 +57,17 @@
       "provider": "openai-codex",
       "model": "gpt-5.4",
       "tokens": {
-        "total": 166727,
-        "input": 431,
-        "output": 377,
-        "cached": 166528,
-        "cachedPercent": 99.9,
+        "total": 173384,
+        "input": 2433,
+        "output": 349,
+        "cached": 172800,
+        "cachedPercent": 99.7,
         "contextWindow": 272000
       },
-      "cost": 9.832397,
-      "updatedAt": "2026-03-11T09:24:04.278000Z",
+      "cost": 11.523046,
+      "updatedAt": "2026-03-11T10:39:56.619000Z",
       "status": "active",
-      "messagesWithUsage": 151
+      "messagesWithUsage": 162
     }
   ],
   "subagents": [],
@@ -75,19 +75,19 @@
     {
       "model": "gpt-5.4",
       "provider": "openai-codex",
-      "tokens": 166727,
-      "input": 431,
-      "output": 377,
+      "tokens": 173384,
+      "input": 2433,
+      "output": 349,
       "sessions": 1,
-      "estimatedCost": 9.832397
+      "estimatedCost": 11.523046
     }
   ],
   "providersBreakdown": [
     {
       "provider": "openai-codex",
-      "tokens": 166727,
+      "tokens": 173384,
       "sessions": 1,
-      "estimatedCost": 9.832397
+      "estimatedCost": 11.523046
     }
   ],
   "apis": [
@@ -1929,6 +1929,138 @@
       "output": 186,
       "totalTokens": 168540,
       "cost": 0.046106999999999995,
+      "provider": "openai-codex",
+      "model": "gpt-5.4",
+      "role": "assistant",
+      "sessionKey": "agent:main:telegram:direct:682287080",
+      "sessionName": "Main session"
+    },
+    {
+      "timestamp": "2026-03-11T09:24:32.236Z",
+      "input": 182,
+      "output": 226,
+      "totalTokens": 168856,
+      "cost": 0.045957,
+      "provider": "openai-codex",
+      "model": "gpt-5.4",
+      "role": "assistant",
+      "sessionKey": "agent:main:telegram:direct:682287080",
+      "sessionName": "Main session"
+    },
+    {
+      "timestamp": "2026-03-11T09:24:37.867Z",
+      "input": 432,
+      "output": 178,
+      "totalTokens": 169314,
+      "cost": 0.045925999999999995,
+      "provider": "openai-codex",
+      "model": "gpt-5.4",
+      "role": "assistant",
+      "sessionKey": "agent:main:telegram:direct:682287080",
+      "sessionName": "Main session"
+    },
+    {
+      "timestamp": "2026-03-11T09:24:47.860Z",
+      "input": 220,
+      "output": 323,
+      "totalTokens": 169759,
+      "cost": 0.047699000000000005,
+      "provider": "openai-codex",
+      "model": "gpt-5.4",
+      "role": "assistant",
+      "sessionKey": "agent:main:telegram:direct:682287080",
+      "sessionName": "Main session"
+    },
+    {
+      "timestamp": "2026-03-11T09:25:52.323Z",
+      "input": 2895,
+      "output": 351,
+      "totalTokens": 170158,
+      "cost": 0.0542305,
+      "provider": "openai-codex",
+      "model": "gpt-5.4",
+      "role": "assistant",
+      "sessionKey": "agent:main:telegram:direct:682287080",
+      "sessionName": "Main session"
+    },
+    {
+      "timestamp": "2026-03-11T09:26:03.548Z",
+      "input": 538,
+      "output": 322,
+      "totalTokens": 170844,
+      "cost": 0.048671,
+      "provider": "openai-codex",
+      "model": "gpt-5.4",
+      "role": "assistant",
+      "sessionKey": "agent:main:telegram:direct:682287080",
+      "sessionName": "Main session"
+    },
+    {
+      "timestamp": "2026-03-11T10:33:35.732Z",
+      "input": 172150,
+      "output": 278,
+      "totalTokens": 172428,
+      "cost": 0.434545,
+      "provider": "openai-codex",
+      "model": "gpt-5.4",
+      "role": "assistant",
+      "sessionKey": "agent:main:telegram:direct:682287080",
+      "sessionName": "Main session"
+    },
+    {
+      "timestamp": "2026-03-11T10:35:33.424Z",
+      "input": 1849,
+      "output": 209,
+      "totalTokens": 173066,
+      "cost": 0.0505095,
+      "provider": "openai-codex",
+      "model": "gpt-5.4",
+      "role": "assistant",
+      "sessionKey": "agent:main:telegram:direct:682287080",
+      "sessionName": "Main session"
+    },
+    {
+      "timestamp": "2026-03-11T10:35:39.871Z",
+      "input": 584,
+      "output": 140,
+      "totalTokens": 173524,
+      "cost": 0.046759999999999996,
+      "provider": "openai-codex",
+      "model": "gpt-5.4",
+      "role": "assistant",
+      "sessionKey": "agent:main:telegram:direct:682287080",
+      "sessionName": "Main session"
+    },
+    {
+      "timestamp": "2026-03-11T10:40:01.304Z",
+      "input": 2744,
+      "output": 95,
+      "totalTokens": 172567,
+      "cost": 0.050717,
+      "provider": "openai-codex",
+      "model": "gpt-5.4",
+      "role": "assistant",
+      "sessionKey": "agent:main:telegram:direct:682287080",
+      "sessionName": "Main session"
+    },
+    {
+      "timestamp": "2026-03-11T10:42:00.327Z",
+      "input": 124917,
+      "output": 6334,
+      "totalTokens": 178867,
+      "cost": 0.41920650000000004,
+      "provider": "openai-codex",
+      "model": "gpt-5.4",
+      "role": "assistant",
+      "sessionKey": "agent:main:telegram:direct:682287080",
+      "sessionName": "Main session"
+    },
+    {
+      "timestamp": "2026-03-11T10:42:12.157Z",
+      "input": 177719,
+      "output": 142,
+      "totalTokens": 177861,
+      "cost": 0.44642750000000003,
       "provider": "openai-codex",
       "model": "gpt-5.4",
       "role": "assistant",

@@ -3,157 +3,588 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard LLM Usage V3</title>
+  <title>Dashboard LLM Usage V4</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --bg: #09111f;
-      --panel: rgba(18, 25, 45, 0.92);
-      --text: #edf2ff;
-      --muted: #98abd0;
-      --accent: #60a5fa;
-      --accent2: #8b5cf6;
-      --accent3: #10b981;
-      --warn: #f59e0b;
-      --danger: #ef4444;
+      --bg: #07101d;
+      --bg-2: #0b1220;
+      --panel: rgba(13, 20, 38, 0.86);
+      --panel-strong: rgba(18, 27, 48, 0.96);
+      --text: #eef4ff;
+      --muted: #9ab0d6;
+      --accent: #6ea8fe;
+      --accent-2: #8b5cf6;
+      --accent-3: #10b981;
+      --accent-4: #f59e0b;
       --border: rgba(255,255,255,.08);
-      --shadow: 0 18px 40px rgba(0,0,0,.22);
+      --shadow: 0 24px 60px rgba(0,0,0,.28);
+      --radius: 24px;
     }
     * { box-sizing: border-box; }
-    body { margin:0; font-family: Inter, system-ui, sans-serif; color:var(--text); background: radial-gradient(circle at top right, rgba(96,165,250,.12), transparent 22%), linear-gradient(180deg, #09111f, #0f172a 50%, #111827); }
-    .wrap { max-width: 1380px; margin: 0 auto; padding: 24px; }
-    .panel,.card { background: var(--panel); border:1px solid var(--border); border-radius:20px; padding:18px; box-shadow: var(--shadow); }
-    .hero { display:grid; grid-template-columns:1.4fr .8fr; gap:16px; margin-bottom:18px; }
-    .grid { display:grid; gap:16px; }
-    .cards { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:18px; }
-    .two { grid-template-columns: 1.1fr .9fr; }
-    .three { grid-template-columns: repeat(3,1fr); }
-    .pill { display:inline-flex; padding:6px 10px; border-radius:999px; font-size:12px; background: rgba(96,165,250,.12); border:1px solid rgba(96,165,250,.2); color:#dbeafe; margin-right:8px; margin-bottom:6px; }
-    h1 { margin:8px 0 6px; font-size:34px; }
-    h2 { margin:0 0 14px; font-size:20px; }
-    p, .sub, .muted { color: var(--muted); }
-    .label { color:var(--muted); font-size:13px; margin-bottom:6px; }
-    .value { font-size:30px; font-weight:800; line-height:1.1; }
-    .table { width:100%; border-collapse:collapse; }
-    .table th,.table td { text-align:left; padding:12px 10px; border-bottom:1px solid var(--border); font-size:14px; vertical-align:top; }
-    .table th { color:#cdddff; font-weight:700; }
-    .badge { display:inline-flex; padding:4px 10px; border-radius:999px; font-size:12px; border:1px solid var(--border); }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(110,168,254,.18), transparent 24%),
+        radial-gradient(circle at top right, rgba(139,92,246,.12), transparent 20%),
+        linear-gradient(180deg, var(--bg), var(--bg-2) 48%, #101827);
+      min-height: 100vh;
+    }
+    .wrap {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.35fr .85fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+    .panel, .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+    .hero-main {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(110,168,254,.18), rgba(139,92,246,.10)),
+        var(--panel-strong);
+    }
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(110,168,254,.22), transparent 65%);
+      pointer-events: none;
+    }
+    .pills { display:flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .pill {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      color:#dbeafe;
+      background: rgba(110,168,254,.10);
+      border:1px solid rgba(110,168,254,.18);
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 1.05;
+      letter-spacing: -.03em;
+    }
+    h2 {
+      margin: 0 0 16px;
+      font-size: 20px;
+      letter-spacing: -.02em;
+    }
+    h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: #d7e5ff;
+    }
+    p, .muted, .sub {
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.55;
+    }
+    .hero-copy { max-width: 760px; }
+    .hero-summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .mini-stat {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 8px;
+    }
+    .value {
+      font-size: clamp(26px, 3vw, 34px);
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: -.03em;
+    }
+    .top-meta .value {
+      font-size: 22px;
+      line-height: 1.2;
+    }
+    .grid { display: grid; gap: 18px; }
+    .cards {
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      margin-bottom: 20px;
+    }
+    .card {
+      position: relative;
+      overflow: hidden;
+      min-height: 138px;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      opacity: .9;
+    }
+    .card .sub { margin-top: 10px; font-size: 13px; }
+    .two { grid-template-columns: 1.08fr .92fr; }
+    .three { grid-template-columns: repeat(3, 1fr); }
+    .chart-panel {
+      min-height: 440px;
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-panel canvas { flex: 1; max-height: 330px; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .section-header .sub { font-size: 13px; }
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.03);
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 620px;
+    }
+    .table th, .table td {
+      text-align: left;
+      padding: 14px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      font-size: 14px;
+      vertical-align: top;
+    }
+    .table th {
+      color: #d9e6ff;
+      font-weight: 700;
+      background: rgba(255,255,255,.02);
+      position: sticky;
+      top: 0;
+    }
+    .badge {
+      display:inline-flex;
+      align-items:center;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--border);
+      white-space: nowrap;
+    }
     .ok { background: rgba(16,185,129,.12); color:#b9f5d7; }
     .warn { background: rgba(245,158,11,.12); color:#ffe2a7; }
-    .mini { background: rgba(255,255,255,.03); border:1px solid var(--border); border-radius:14px; padding:12px; }
-    canvas { max-height: 340px; }
-    code { color:#dbeafe; }
-    @media (max-width: 980px){ .hero,.two,.three{ grid-template-columns:1fr; } }
+    .mini {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .notes-list {
+      padding-left: 18px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .notes-list li + li { margin-top: 8px; }
+    .footer {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    code {
+      color: #dce9ff;
+      background: rgba(255,255,255,.05);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+    .glow-accent { color: #dfeaff; }
+    .hero-actions {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+    .ghost-link {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      text-decoration:none;
+      color:#dce9ff;
+      border:1px solid rgba(255,255,255,.10);
+      padding:10px 14px;
+      border-radius:999px;
+      background: rgba(255,255,255,.03);
+    }
+    .ghost-link:hover { background: rgba(255,255,255,.06); }
+    @media (max-width: 1080px) {
+      .hero, .two, .three { grid-template-columns: 1fr; }
+      .hero-summary { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 680px) {
+      .wrap { padding: 18px; }
+      .cards { grid-template-columns: 1fr 1fr; }
+      .hero-summary { grid-template-columns: 1fr; }
+      .card { min-height: 120px; }
+    }
+    @media (max-width: 520px) {
+      .cards { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 <div class="wrap">
   <section class="hero">
-    <div class="panel">
-      <div class="pill">JanusOne ⭐</div><div class="pill">V3</div><div class="pill">Auto-collected</div>
-      <h1>Dashboard d’usage LLM</h1>
-      <p>V3 lit automatiquement les sessions OpenClaw locales, agrège les usages réels, les coûts remontés par le provider et prépare la vue main + sous-agents sans saisie manuelle.</p>
+    <div class="panel hero-main">
+      <div class="pills">
+        <div class="pill">JanusOne ⭐</div>
+        <div class="pill">V4 Design</div>
+        <div class="pill">Auto-collected</div>
+      </div>
+      <h1>Dashboard d’usage <span class="glow-accent">LLM</span></h1>
+      <p class="hero-copy">Une version plus propre, plus moderne et plus lisible du dashboard. Il agrège automatiquement les sessions OpenClaw locales, les coûts remontés par le provider, les modèles utilisés et prépare l’affichage des sous-agents dès qu’ils existent.</p>
+      <div class="hero-actions">
+        <a class="ghost-link" href="./usage-data.json" target="_blank" rel="noopener noreferrer">Voir les données JSON</a>
+        <a class="ghost-link" href="./README.txt" target="_blank" rel="noopener noreferrer">Lire les notes</a>
+      </div>
     </div>
-    <div class="panel">
+
+    <div class="panel top-meta">
       <div class="label">Dernière génération</div>
-      <div id="generatedAt" class="value" style="font-size:22px">—</div>
-      <div id="providers" class="sub">—</div>
-      <div class="grid two" style="margin-top:12px; grid-template-columns:1fr 1fr;">
-        <div class="mini"><div class="label">Cache hit</div><div id="cacheHit" class="value" style="font-size:22px">—</div></div>
-        <div class="mini"><div class="label">Coût estimé</div><div id="estimatedCost" class="value" style="font-size:22px">—</div></div>
+      <div id="generatedAt" class="value">—</div>
+      <p id="providers" class="sub" style="margin-top:10px;">—</p>
+      <div class="hero-summary">
+        <div class="mini-stat">
+          <div class="label">Cache hit</div>
+          <div id="cacheHit" class="value">—</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label">Coût estimé</div>
+          <div id="estimatedCost" class="value">—</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label">Sessions</div>
+          <div id="sessionsCount" class="value">0</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label">Sous-agents</div>
+          <div id="subagentsCount" class="value">0</div>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="grid cards">
-    <div class="card"><div class="label">Sessions suivies</div><div id="sessionsCount" class="value">0</div></div>
-    <div class="card"><div class="label">Sous-agents</div><div id="subagentsCount" class="value">0</div></div>
-    <div class="card"><div class="label">Tokens total</div><div id="tokensTotal" class="value">0</div></div>
-    <div class="card"><div class="label">Input</div><div id="inputTotal" class="value">0</div></div>
-    <div class="card"><div class="label">Output</div><div id="outputTotal" class="value">0</div></div>
+    <div class="card"><div class="label">Tokens total</div><div id="tokensTotal" class="value">0</div><div class="sub">Total agrégé visible dans les sessions connues</div></div>
+    <div class="card"><div class="label">Input</div><div id="inputTotal" class="value">0</div><div class="sub">Tokens d’entrée connus</div></div>
+    <div class="card"><div class="label">Output</div><div id="outputTotal" class="value">0</div><div class="sub">Tokens de sortie connus</div></div>
     <div class="card"><div class="label">Modèles</div><div id="modelsCount" class="value">0</div><div id="modelsList" class="sub">—</div></div>
   </section>
 
   <section class="grid two">
-    <div class="panel"><h2>Usage par session / agent</h2><canvas id="agentsChart"></canvas></div>
-    <div class="panel"><h2>Input vs Output</h2><canvas id="ioChart"></canvas></div>
+    <div class="panel chart-panel">
+      <div class="section-header">
+        <div>
+          <h2>Usage par session / agent</h2>
+          <p class="sub">Compare rapidement les volumes entre session principale et futurs sous-agents.</p>
+        </div>
+      </div>
+      <canvas id="agentsChart"></canvas>
+    </div>
+    <div class="panel chart-panel">
+      <div class="section-header">
+        <div>
+          <h2>Input vs Output</h2>
+          <p class="sub">Vue simple des flux d’entrée/sortie par session.</p>
+        </div>
+      </div>
+      <canvas id="ioChart"></canvas>
+    </div>
   </section>
 
-  <section class="grid two" style="margin-top:16px;">
-    <div class="panel"><h2>Répartition par modèle</h2><canvas id="modelsChart"></canvas></div>
-    <div class="panel"><h2>Répartition par provider</h2><canvas id="providersChart"></canvas></div>
+  <section class="grid two" style="margin-top:18px;">
+    <div class="panel chart-panel">
+      <div class="section-header">
+        <div>
+          <h2>Répartition par modèle</h2>
+          <p class="sub">Répartition du volume de tokens entre les modèles détectés.</p>
+        </div>
+      </div>
+      <canvas id="modelsChart"></canvas>
+    </div>
+    <div class="panel chart-panel">
+      <div class="section-header">
+        <div>
+          <h2>Répartition par provider</h2>
+          <p class="sub">Distribution globale par fournisseur de modèle.</p>
+        </div>
+      </div>
+      <canvas id="providersChart"></canvas>
+    </div>
   </section>
 
-  <section class="grid two" style="margin-top:16px;">
-    <div class="panel"><h2>Timeline tokens par message</h2><canvas id="timelineChart"></canvas></div>
-    <div class="panel"><h2>APIs connectées</h2><canvas id="apiChart"></canvas></div>
+  <section class="grid two" style="margin-top:18px;">
+    <div class="panel chart-panel">
+      <div class="section-header">
+        <div>
+          <h2>Timeline tokens / message</h2>
+          <p class="sub">Aperçu du rythme de consommation dans le temps.</p>
+        </div>
+      </div>
+      <canvas id="timelineChart"></canvas>
+    </div>
+    <div class="panel chart-panel">
+      <div class="section-header">
+        <div>
+          <h2>APIs connectées</h2>
+          <p class="sub">Vue synthétique des intégrations disponibles dans l’environnement.</p>
+        </div>
+      </div>
+      <canvas id="apiChart"></canvas>
+    </div>
   </section>
 
-  <section class="grid two" style="margin-top:16px;">
+  <section class="grid two" style="margin-top:18px;">
     <div class="panel">
-      <h2>Sessions et sous-agents</h2>
-      <table class="table"><thead><tr><th>Nom</th><th>Type</th><th>Modèle</th><th>Tokens</th><th>Coût</th><th>Statut</th></tr></thead><tbody id="sessionsBody"></tbody></table>
+      <div class="section-header">
+        <div>
+          <h2>Sessions et sous-agents</h2>
+          <p class="sub">Table de lecture détaillée des sessions visibles.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>Nom</th><th>Type</th><th>Modèle</th><th>Tokens</th><th>Coût</th><th>Statut</th></tr>
+          </thead>
+          <tbody id="sessionsBody"></tbody>
+        </table>
+      </div>
     </div>
     <div class="panel">
-      <h2>Vue sous-agents</h2>
+      <div class="section-header">
+        <div>
+          <h2>Vue sous-agents</h2>
+          <p class="sub">Prête à afficher tes agents persistants dès qu’ils sont présents.</p>
+        </div>
+      </div>
       <div id="subagentsPanel" class="muted"></div>
     </div>
   </section>
 
-  <section class="grid two" style="margin-top:16px;">
+  <section class="grid two" style="margin-top:18px;">
     <div class="panel">
-      <h2>Inventaire des APIs</h2>
-      <table class="table"><thead><tr><th>API</th><th>Groupe</th><th>État</th></tr></thead><tbody id="apisBody"></tbody></table>
+      <div class="section-header">
+        <div>
+          <h2>Inventaire des APIs</h2>
+          <p class="sub">État rapide des APIs et intégrations visibles côté environnement.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>API</th><th>Groupe</th><th>État</th></tr></thead>
+          <tbody id="apisBody"></tbody>
+        </table>
+      </div>
     </div>
     <div class="panel">
-      <h2>Notes & limites</h2>
-      <ul id="notesList" class="muted"></ul>
-      <div class="muted">Fichier de données: <code>usage-data.json</code> · Généré par <code>generate_usage_data.py</code></div>
+      <div class="section-header">
+        <div>
+          <h2>Notes & limites</h2>
+          <p class="sub">Contexte utile pour interpréter les chiffres du dashboard.</p>
+        </div>
+      </div>
+      <ul id="notesList" class="notes-list"></ul>
+      <div class="footer">
+        <div>Fichier de données : <code>usage-data.json</code></div>
+        <div>Généré par : <code>generate_usage_data.py</code></div>
+      </div>
     </div>
   </section>
 </div>
 <script>
 const fmt = new Intl.NumberFormat('fr-FR');
-const safe = (v,f='—') => (v===null||v===undefined||v==='') ? f : v;
-const badge = s => `<span class="badge ${(s==='connected'||s==='active')?'ok':'warn'}">${s}</span>`;
-const money = v => (v===null||v===undefined) ? '—' : `${v.toFixed(4)} $`;
-const chartText = '#edf2ff';
+const safe = (v, f='—') => (v === null || v === undefined || v === '') ? f : v;
+const badge = s => `<span class="badge ${(s === 'connected' || s === 'active') ? 'ok' : 'warn'}">${s}</span>`;
+const money = v => (v === null || v === undefined) ? '—' : `${v.toFixed(4)} $`;
+const chartText = '#eef4ff';
 const gridColor = 'rgba(255,255,255,.06)';
 
-fetch('./usage-data.json').then(r=>r.json()).then(data => {
-  const rows = [...(data.sessions||[]), ...(data.subagents||[])];
-  document.getElementById('generatedAt').textContent = new Date(data.generatedAt).toLocaleString('fr-FR');
-  document.getElementById('providers').textContent = `Providers: ${(data.summary.providers||[]).join(', ') || '—'}`;
-  document.getElementById('cacheHit').textContent = `${safe(data.summary.cacheHitPercent,0)}%`;
-  document.getElementById('estimatedCost').textContent = money(data.summary.estimatedCost);
-  document.getElementById('sessionsCount').textContent = fmt.format(data.summary.sessions||0);
-  document.getElementById('subagentsCount').textContent = fmt.format(data.summary.subagents||0);
-  document.getElementById('tokensTotal').textContent = fmt.format(data.summary.totalTokensKnown||0);
-  document.getElementById('inputTotal').textContent = fmt.format(data.summary.totalInputKnown||0);
-  document.getElementById('outputTotal').textContent = fmt.format(data.summary.totalOutputKnown||0);
-  document.getElementById('modelsCount').textContent = fmt.format((data.summary.models||[]).length);
-  document.getElementById('modelsList').textContent = (data.summary.models||[]).join(', ') || '—';
+fetch('./usage-data.json')
+  .then(r => r.json())
+  .then(data => {
+    const rows = [...(data.sessions || []), ...(data.subagents || [])];
 
-  document.getElementById('sessionsBody').innerHTML = rows.map(s => `
-    <tr><td>${safe(s.name)}</td><td>${safe(s.kind)}</td><td>${safe(s.model)}</td><td>${fmt.format((s.tokens&&s.tokens.total)||0)}</td><td>${money(s.cost)}</td><td>${badge(s.status||'unknown')}</td></tr>
-  `).join('') || '<tr><td colspan="6">Aucune session</td></tr>';
+    document.getElementById('generatedAt').textContent = new Date(data.generatedAt).toLocaleString('fr-FR');
+    document.getElementById('providers').textContent = `Providers : ${(data.summary.providers || []).join(', ') || '—'}`;
+    document.getElementById('cacheHit').textContent = `${safe(data.summary.cacheHitPercent, 0)}%`;
+    document.getElementById('estimatedCost').textContent = money(data.summary.estimatedCost);
+    document.getElementById('sessionsCount').textContent = fmt.format(data.summary.sessions || 0);
+    document.getElementById('subagentsCount').textContent = fmt.format(data.summary.subagents || 0);
+    document.getElementById('tokensTotal').textContent = fmt.format(data.summary.totalTokensKnown || 0);
+    document.getElementById('inputTotal').textContent = fmt.format(data.summary.totalInputKnown || 0);
+    document.getElementById('outputTotal').textContent = fmt.format(data.summary.totalOutputKnown || 0);
+    document.getElementById('modelsCount').textContent = fmt.format((data.summary.models || []).length);
+    document.getElementById('modelsList').textContent = (data.summary.models || []).join(', ') || '—';
 
-  const sub = document.getElementById('subagentsPanel');
-  sub.innerHTML = (data.subagents||[]).length ? data.subagents.map(s => `<div class="mini" style="margin-bottom:10px;"><strong>${s.name}</strong><div class="muted">${safe(s.model)} · ${fmt.format((s.tokens&&s.tokens.total)||0)} tokens · ${money(s.cost)}</div></div>`).join('') : '<div class="muted">Aucun sous-agent détecté pour le moment. Dès qu’un sous-agent apparaît dans les sessions OpenClaw, il sera affiché ici automatiquement.</div>';
+    document.getElementById('sessionsBody').innerHTML = rows.length
+      ? rows.map(s => `
+        <tr>
+          <td>${safe(s.name)}</td>
+          <td>${safe(s.kind)}</td>
+          <td>${safe(s.model)}</td>
+          <td>${fmt.format((s.tokens && s.tokens.total) || 0)}</td>
+          <td>${money(s.cost)}</td>
+          <td>${badge(s.status || 'unknown')}</td>
+        </tr>
+      `).join('')
+      : '<tr><td colspan="6">Aucune session</td></tr>';
 
-  document.getElementById('apisBody').innerHTML = (data.apis||[]).map(api => `<tr><td>${api.name}</td><td>${safe(api.group)}</td><td>${badge(api.status)}</td></tr>`).join('');
-  document.getElementById('notesList').innerHTML = (data.summary.notes||[]).map(n => `<li>${n}</li>`).join('');
+    const sub = document.getElementById('subagentsPanel');
+    sub.innerHTML = (data.subagents || []).length
+      ? data.subagents.map(s => `
+        <div class="mini">
+          <h3>${s.name}</h3>
+          <p>${safe(s.model)} · ${fmt.format((s.tokens && s.tokens.total) || 0)} tokens · ${money(s.cost)}</p>
+        </div>
+      `).join('')
+      : '<div class="mini"><h3>Aucun sous-agent détecté</h3><p>La section est déjà prête. Dès qu’un sous-agent apparaît dans les sessions OpenClaw, il sera affiché ici automatiquement.</p></div>';
 
-  const common = { responsive:true, plugins:{ legend:{ labels:{ color:chartText } } }, scales:{ x:{ ticks:{ color:chartText }, grid:{ color:gridColor } }, y:{ ticks:{ color:chartText }, grid:{ color:gridColor } } } };
+    document.getElementById('apisBody').innerHTML = (data.apis || []).map(api => `
+      <tr>
+        <td>${api.name}</td>
+        <td>${safe(api.group)}</td>
+        <td>${badge(api.status)}</td>
+      </tr>
+    `).join('');
 
-  new Chart(document.getElementById('agentsChart'), { type:'bar', data:{ labels:rows.map(r=>r.name), datasets:[{ label:'Tokens', data:rows.map(r=>(r.tokens&&r.tokens.total)||0), backgroundColor:'#60a5fa' }]}, options:common });
-  new Chart(document.getElementById('ioChart'), { type:'bar', data:{ labels:rows.map(r=>r.name), datasets:[{ label:'Input', data:rows.map(r=>(r.tokens&&r.tokens.input)||0), backgroundColor:'#8b5cf6' },{ label:'Output', data:rows.map(r=>(r.tokens&&r.tokens.output)||0), backgroundColor:'#10b981' }]}, options:common });
-  new Chart(document.getElementById('modelsChart'), { type:'doughnut', data:{ labels:(data.modelsBreakdown||[]).map(m=>m.model), datasets:[{ data:(data.modelsBreakdown||[]).map(m=>m.tokens), backgroundColor:['#60a5fa','#8b5cf6','#10b981','#f59e0b','#ef4444'] }]}, options:{ plugins:{ legend:{ labels:{ color:chartText } } } } });
-  new Chart(document.getElementById('providersChart'), { type:'pie', data:{ labels:(data.providersBreakdown||[]).map(p=>p.provider), datasets:[{ data:(data.providersBreakdown||[]).map(p=>p.tokens), backgroundColor:['#60a5fa','#8b5cf6','#10b981','#f59e0b'] }]}, options:{ plugins:{ legend:{ labels:{ color:chartText } } } } });
-  new Chart(document.getElementById('timelineChart'), { type:'line', data:{ labels:(data.timeline||[]).map((p,i)=> i+1), datasets:[{ label:'Tokens / message', data:(data.timeline||[]).map(p=>p.totalTokens||0), borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,.2)', tension:.25, fill:true }]}, options:common });
-  const apiCounts = { connected:(data.apis||[]).filter(a=>a.status==='connected').length, other:(data.apis||[]).filter(a=>a.status!=='connected').length };
-  new Chart(document.getElementById('apiChart'), { type:'doughnut', data:{ labels:['Connectées','À vérifier'], datasets:[{ data:[apiCounts.connected, apiCounts.other], backgroundColor:['#10b981','#f59e0b'] }]}, options:{ plugins:{ legend:{ labels:{ color:chartText } } } } });
-});
+    document.getElementById('notesList').innerHTML = (data.summary.notes || []).map(n => `<li>${n}</li>`).join('');
+
+    const common = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: chartText } } },
+      scales: {
+        x: { ticks: { color: chartText }, grid: { color: gridColor } },
+        y: { ticks: { color: chartText }, grid: { color: gridColor } }
+      }
+    };
+
+    new Chart(document.getElementById('agentsChart'), {
+      type: 'bar',
+      data: {
+        labels: rows.map(r => r.name),
+        datasets: [{
+          label: 'Tokens',
+          data: rows.map(r => (r.tokens && r.tokens.total) || 0),
+          backgroundColor: ['#6ea8fe', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444']
+        }]
+      },
+      options: common
+    });
+
+    new Chart(document.getElementById('ioChart'), {
+      type: 'bar',
+      data: {
+        labels: rows.map(r => r.name),
+        datasets: [
+          { label: 'Input', data: rows.map(r => (r.tokens && r.tokens.input) || 0), backgroundColor: '#8b5cf6' },
+          { label: 'Output', data: rows.map(r => (r.tokens && r.tokens.output) || 0), backgroundColor: '#10b981' }
+        ]
+      },
+      options: common
+    });
+
+    new Chart(document.getElementById('modelsChart'), {
+      type: 'doughnut',
+      data: {
+        labels: (data.modelsBreakdown || []).map(m => m.model),
+        datasets: [{
+          data: (data.modelsBreakdown || []).map(m => m.tokens),
+          backgroundColor: ['#6ea8fe', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444']
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: chartText } } } }
+    });
+
+    new Chart(document.getElementById('providersChart'), {
+      type: 'pie',
+      data: {
+        labels: (data.providersBreakdown || []).map(p => p.provider),
+        datasets: [{
+          data: (data.providersBreakdown || []).map(p => p.tokens),
+          backgroundColor: ['#6ea8fe', '#8b5cf6', '#10b981', '#f59e0b']
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: chartText } } } }
+    });
+
+    new Chart(document.getElementById('timelineChart'), {
+      type: 'line',
+      data: {
+        labels: (data.timeline || []).map((_, i) => i + 1),
+        datasets: [{
+          label: 'Tokens / message',
+          data: (data.timeline || []).map(p => p.totalTokens || 0),
+          borderColor: '#6ea8fe',
+          backgroundColor: 'rgba(110,168,254,.18)',
+          pointBackgroundColor: '#8b5cf6',
+          pointRadius: 2,
+          pointHoverRadius: 4,
+          tension: .3,
+          fill: true
+        }]
+      },
+      options: common
+    });
+
+    const apiCounts = {
+      connected: (data.apis || []).filter(a => a.status === 'connected').length,
+      other: (data.apis || []).filter(a => a.status !== 'connected').length
+    };
+
+    new Chart(document.getElementById('apiChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Connectées', 'À vérifier'],
+        datasets: [{ data: [apiCounts.connected, apiCounts.other], backgroundColor: ['#10b981', '#f59e0b'] }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: chartText } } } }
+    });
+  });
 </script>
 </body>
 </html>
