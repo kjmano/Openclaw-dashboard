@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analyse des limites — openai-codex/gpt-5.4</title>
+  <style>
+    :root {
+      --bg: #07101d;
+      --bg-2: #0b1220;
+      --panel: rgba(13, 20, 38, 0.88);
+      --panel-strong: rgba(18, 27, 48, 0.96);
+      --text: #eef4ff;
+      --muted: #9ab0d6;
+      --accent: #6ea8fe;
+      --accent-2: #8b5cf6;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --border: rgba(255,255,255,.08);
+      --shadow: 0 24px 60px rgba(0,0,0,.28);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(110,168,254,.18), transparent 24%),
+        radial-gradient(circle at top right, rgba(139,92,246,.12), transparent 20%),
+        linear-gradient(180deg, var(--bg), var(--bg-2) 48%, #101827);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      margin-bottom: 18px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(110,168,254,.18), rgba(139,92,246,.10)), var(--panel-strong);
+    }
+    h1 { margin: 0 0 10px; font-size: clamp(30px, 4vw, 42px); letter-spacing: -.03em; }
+    h2 { margin: 0 0 14px; font-size: 22px; }
+    h3 { margin: 0 0 8px; font-size: 17px; }
+    p, li { color: var(--muted); line-height: 1.6; }
+    .sub { color: var(--muted); }
+    .grid { display: grid; gap: 18px; }
+    .cards { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+    .card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+    .value { font-size: 28px; font-weight: 800; letter-spacing: -.03em; }
+    .badge { display:inline-block; padding:6px 10px; border-radius:999px; font-size:12px; }
+    .ok { background: rgba(16,185,129,.12); color: #b9f5d7; }
+    .warn { background: rgba(245,158,11,.12); color: #ffe2a7; }
+    .danger { background: rgba(239,68,68,.12); color: #ffc1c1; }
+    .two { grid-template-columns: 1fr 1fr; }
+    .box {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    code {
+      color: #dce9ff;
+      background: rgba(255,255,255,.05);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+    a { color: #b9d3ff; }
+    ul { margin-top: 8px; }
+    .footer { font-size: 13px; color: var(--muted); }
+    @media (max-width: 800px) { .two { grid-template-columns: 1fr; } .wrap { padding: 18px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="panel hero">
+      <div class="badge warn">Analyse pragmatique</div>
+      <h1>Limites d’usage <code>openai-codex/gpt-5.4</code></h1>
+      <p>
+        Cette page répond à une question simple&nbsp;: <strong>combien de tokens peut-on utiliser avant de tomber sur un “API rate limit reached”</strong>
+        avec <code>openai-codex/gpt-5.4</code> dans OpenClaw ?
+      </p>
+      <p>
+        Réponse courte&nbsp;: <strong>il n’existe pas un seul “nombre magique” public</strong>. Les limites dépendent du type d’accès,
+        du compte, du tier, du débit de requêtes et parfois d’un quota glissant.
+      </p>
+    </section>
+
+    <section class="grid cards panel">
+      <div class="card">
+        <div class="label">Conclusion principale</div>
+        <div class="value">Pas de plafond unique public</div>
+        <p>Le message de rate limit peut être causé par le débit (RPM/TPM), pas seulement par le total accumulé.</p>
+      </div>
+      <div class="card">
+        <div class="label">Ce que la doc publique confirme</div>
+        <div class="value">RPM + TPM + usage tier</div>
+        <p>Les limites OpenAI combinent requêtes/minute, tokens/minute, parfois requêtes/jour ou tokens/jour.</p>
+      </div>
+      <div class="card">
+        <div class="label">Cas probable si attente très longue</div>
+        <div class="value">Quota / fenêtre glissante</div>
+        <p>Attendre plusieurs jours ressemble moins à un petit pic minute qu’à une restriction liée au compte ou au quota.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>1) Ce que dit la documentation publique</h2>
+      <div class="grid two">
+        <div class="box">
+          <h3>OpenAI API — rate limits</h3>
+          <ul>
+            <li>OpenAI documente des limites de type <strong>RPM</strong> (requests per minute) et <strong>TPM</strong> (tokens per minute).</li>
+            <li>Les limites <strong>varient selon le modèle</strong>.</li>
+            <li>Elles <strong>dépendent aussi du tier d’usage</strong> du compte.</li>
+            <li>La page explique aussi qu’on peut voir les limites exactes dans la console développeur du compte.</li>
+          </ul>
+          <p class="footer">Source publique utilisée : OpenAI API docs — “Rate limits”.</p>
+        </div>
+        <div class="box">
+          <h3>Page modèle GPT-5 (référence publique proche)</h3>
+          <ul>
+            <li>La page publique GPT-5 affiche des limites par tier pour l’API directe.</li>
+            <li>Exemple visible publiquement pour <strong>GPT-5 API</strong> : Tier 1 = <strong>500 RPM</strong> et <strong>500,000 TPM</strong>.</li>
+            <li>Mais <strong>ça ne prouve pas</strong> que le même plafond s’applique tel quel à <code>openai-codex/gpt-5.4</code> via Codex OAuth dans OpenClaw.</li>
+          </ul>
+          <p class="footer">Important : c’est un point de comparaison, pas une preuve de la limite exacte de ton accès.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>2) Ce qu’OpenClaw confirme</h2>
+      <div class="box">
+        <p>
+          OpenClaw documente que <code>openai-codex/gpt-5.4</code> est le mapping utilisé pour l’accès
+          <strong>Codex OAuth / ChatGPT-Codex</strong>. Donc ton usage ici n’est pas forcément identique à un usage API classique avec clé OpenAI.
+        </p>
+        <p>
+          En clair : <strong>modèle proche, chemin d’accès différent, règles de quota potentiellement différentes</strong>.
+        </p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>3) Estimation pour ton cas</h2>
+      <div class="grid two">
+        <div class="box">
+          <h3>Ce qu’on peut estimer</h3>
+          <ul>
+            <li>Dans la session que j’ai inspectée, on a vu un point de mesure à environ <strong>8.3k tokens input</strong> et <strong>52 output</strong>.</li>
+            <li>Ça donne un ordre de grandeur d’environ <strong>8.3k à 9k tokens</strong> autour du moment où on parlait du rate limit.</li>
+            <li>Ce volume, à lui seul, n’a rien d’énorme.</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h3>Ce que ça suggère</h3>
+          <ul>
+            <li>Si tu as vraiment dû attendre <strong>6 jours</strong>, le problème ne ressemble <strong>pas</strong> à un simple dépassement ponctuel de tokens sur une minute.</li>
+            <li>Le scénario le plus crédible est plutôt un <strong>quota de compte</strong>, une <strong>fenêtre glissante longue</strong>, ou une politique de limitation propre à l’accès Codex OAuth.</li>
+            <li>Donc : le blocage semble plus lié à <strong>la politique d’accès</strong> qu’à un total du style “tu as atteint exactement X tokens”.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>4) Ce qu’on peut dire sans mentir</h2>
+      <ul>
+        <li><strong>Oui</strong>, il existe des limites de requêtes et de tokens côté OpenAI.</li>
+        <li><strong>Oui</strong>, elles varient selon le modèle et le tier.</li>
+        <li><strong>Non</strong>, je n’ai pas de preuve publique fiable d’un plafond unique et exact pour <code>openai-codex/gpt-5.4</code> dans ton mode d’accès actuel.</li>
+        <li><strong>Non</strong>, les ~8.3k–9k tokens observés ne suffisent pas à expliquer à eux seuls une attente de 6 jours.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>5) Mon verdict</h2>
+      <p>
+        Le plus honnête est de dire ceci&nbsp;:
+      </p>
+      <div class="box">
+        <p>
+          <strong>Pour <code>openai-codex/gpt-5.4</code>, la limite que tu as rencontrée ne semble pas correspondre à un simple total public de tokens.</strong>
+          Avec les éléments visibles, ton incident ressemble davantage à un quota ou à une limitation de service liée au compte / au mode d’accès Codex,
+          possiblement sur une fenêtre longue, qu’à un plafond simple du type “tu as utilisé X tokens et c’est fini”.
+        </p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Sources</h2>
+      <ul>
+        <li><a href="https://developers.openai.com/api/docs/guides/rate-limits" target="_blank" rel="noopener noreferrer">OpenAI API docs — Rate limits</a></li>
+        <li><a href="https://developers.openai.com/api/docs/models/gpt-5" target="_blank" rel="noopener noreferrer">OpenAI API docs — GPT-5 model page</a></li>
+      </ul>
+      <p class="footer">Page préparée pour publication GitHub Pages depuis le repo <code>kjmano/Openclaw-dashboard</code>.</p>
+    </section>
+  </div>
+</body>
+</html>
